@@ -3,14 +3,14 @@ import os
 hps = {
     'network': '',  # which network do you want to train
     'name': '',  # whatever you want to name your run
-    'n_epochs': 300,
+    'n_epochs': 100 ,
     'model_save_dir': None,  # where will checkpoints be stored (path created automatically using hps[name])
     'restore_epoch': None,  # continue training from a specific saved point
     'start_epoch': 0,
     'lr': 0.01,  # starting learning rate
-    'save_freq': 20,  # how often to create checkpoints
+    'save_freq': 2,  # how often to create checkpoints
     'drop': 0.1,
-    'bs': 64,
+    'bs': 256,
 }
 
 possible_nets = set(filename.split(".")[0] for filename in os.listdir('models'))

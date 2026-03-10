@@ -51,22 +51,26 @@ def get_dataloaders(path='datasets/fer2013/fer2013.csv', bs=64, augment=True):
 
     test_transform = transforms.Compose([
         # transforms.Scale(52),
-        transforms.TenCrop(40),
+        # transforms.TenCrop(40),
+        transforms.CenterCrop(46),
+        transforms.Lambda(lambda img: [img]),
         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
-        transforms.Lambda(lambda tensors: torch.stack([transforms.Normalize(mean=(mu,), std=(st,))(t) for t in tensors])),
+        # transforms.Lambda(lambda tensors: torch.stack([transforms.Normalize(mean=(mu,), std=(st,))(t) for t in tensors])),
     ])
 
     if augment:
         train_transform = transforms.Compose([
-            transforms.RandomResizedCrop(48, scale=(0.8, 1.2)),
-            transforms.RandomApply([transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5),
+            # transforms.RandomResizedCrop(48, scale=(0.8, 1.2)),
+            # transforms.RandomApply([transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
+            # transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
 
-            transforms.TenCrop(40),
+            # transforms.TenCrop(40),
+            transforms.CenterCrop(46),
+            transforms.Lambda(lambda img: [img]),
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
-            transforms.Lambda(lambda tensors: torch.stack([transforms.Normalize(mean=(mu,), std=(st,))(t) for t in tensors])),
-            transforms.Lambda(lambda tensors: torch.stack([transforms.RandomErasing(p=0.5)(t) for t in tensors])),
+            # transforms.Lambda(lambda tensors: torch.stack([transforms.Normalize(mean=(mu,), std=(st,))(t) for t in tensors])),
+            # transforms.Lambda(lambda tensors: torch.stack([transforms.RandomErasing(p=0.5)(t) for t in tensors])),
         ])
     else:
         train_transform = test_transform
