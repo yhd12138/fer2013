@@ -6,6 +6,7 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
+from MyUtils import get_lr_lambda, get_lr_lambda2
 from data.fer2013 import get_dataloaders
 from utils.checkpoint import save
 from utils.hparams import setup_hparams
@@ -31,11 +32,30 @@ def run(net, logger, hps):
     # optimizer = torch.optim.ASGD(net.parameters(), lr=learning_rate, weight_decay=0.0001)
     optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9, nesterov=True, weight_decay=0.0001)
 
-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.75, patience=5, verbose=True)
+    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.75, patience=5, verbose=True) # scheduler.step(acc_v)
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 20, gamma=0.5, last_epoch=-1, verbose=True)
     # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, steps_per_epoch=len(trainloader), epochs=hps['n_epochs'])
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=1e-6, last_epoch=-1, verbose=True)
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=1e-6, last_epoch=-1, verbose=False)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hps['n_epochs'], eta_min=1e-6, last_epoch=-1, verbose=False)
+    # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda2)
+    # ### Start of SequentialLR
+    # # 2. 设置参数
+    # warmup_epochs = 10      # 预热 10 个 epoch
+    # total_epochs = hps['n_epochs']      # 总共 100 个 epoch
+    # cosine_epochs = total_epochs - warmup_epochs # 余弦退火的阶段
+    # 
+    # # 3. 定义 Warmup 调度器：从起始 LR 的 0.1 倍增加到原始 LR
+    # scheduler_warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs)
+    # 
+    # # 4. 定义 CosineAnnealing 调度器
+    # scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cosine_epochs, eta_min=1e-6)
+    # 
+    # # 5. 使用 SequentialLR 将两者组合
+    # # milestones 表示在哪个时间点切换调度器
+    # scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[scheduler_warmup, scheduler_cosine], milestones=[warmup_epochs])
+    # ### End of SequentialLR
+
     criterion = nn.CrossEntropyLoss()
 
     best_acc = 0.0
@@ -52,7 +72,7 @@ def run(net, logger, hps):
         logger.acc_val.append(acc_v)
 
         # Update learning rate
-        scheduler.step(acc_v)
+        scheduler.step()
 
         if acc_v > best_acc:
             best_acc = acc_v
