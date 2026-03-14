@@ -36,25 +36,25 @@ def run(net, logger, hps):
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 5, gamma=0.1, last_epoch=-1)
     # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, steps_per_epoch=len(trainloader), epochs=hps['n_epochs'])
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=1e-6, last_epoch=-1, verbose=True)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hps['n_epochs'], eta_min=1e-6, last_epoch=-1)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hps['n_epochs'], eta_min=1e-4, last_epoch=-1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda2)
-    # ### Start of SequentialLR
-    # # 2. 设置参数
-    # warmup_epochs = 10      # 预热 10 个 epoch
-    # total_epochs = hps['n_epochs']      # 总共 100 个 epoch
-    # cosine_epochs = total_epochs - warmup_epochs # 余弦退火的阶段
-    # 
-    # # 3. 定义 Warmup 调度器：从起始 LR 的 0.1 倍增加到原始 LR
-    # scheduler_warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs)
-    # 
-    # # 4. 定义 CosineAnnealing 调度器
-    # scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cosine_epochs, eta_min=1e-6)
-    # 
-    # # 5. 使用 SequentialLR 将两者组合
-    # # milestones 表示在哪个时间点切换调度器
-    # scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[scheduler_warmup, scheduler_cosine], milestones=[warmup_epochs])
-    # ### End of SequentialLR
+    ### Start of SequentialLR
+    # 2. 设置参数
+    warmup_epochs = 2      # 预热 10 个 epoch
+    total_epochs = hps['n_epochs']      # 总共 100 个 epoch
+    cosine_epochs = total_epochs - warmup_epochs # 余弦退火的阶段
+    
+    # 3. 定义 Warmup 调度器：从起始 LR 的 0.1 倍增加到原始 LR
+    scheduler_warmup = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs)
+    
+    # 4. 定义 CosineAnnealing 调度器
+    scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cosine_epochs, eta_min=1e-6)
+    
+    # 5. 使用 SequentialLR 将两者组合
+    # milestones 表示在哪个时间点切换调度器
+    scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[scheduler_warmup, scheduler_cosine], milestones=[warmup_epochs])
+    ### End of SequentialLR
 
     criterion = nn.CrossEntropyLoss()
 

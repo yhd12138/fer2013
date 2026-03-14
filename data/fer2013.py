@@ -52,6 +52,7 @@ def get_dataloaders(path='datasets/fer2013/fer2013.csv', bs=64, augment=True):
     test_transform = transforms.Compose([
         # transforms.Scale(52),
         # transforms.TenCrop(40),
+        # transforms.Grayscale(num_output_channels=1),
         transforms.CenterCrop(46), transforms.Lambda(lambda img: [img]),
         transforms.Lambda(lambda crops: torch.stack([
             transforms.Normalize((mu,), (st,))(
@@ -66,6 +67,9 @@ def get_dataloaders(path='datasets/fer2013/fer2013.csv', bs=64, augment=True):
             # transforms.RandomApply([transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5),
             # transforms.RandomHorizontalFlip(),
             # transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
+            # transforms.Grayscale(num_output_channels=1),
+            # transforms.RandomPerspective(distortion_scale=0.2,p=0.3),
+            # RandomAdjustSharpness(2, p=0.3)
 
             # transforms.TenCrop(40),
             transforms.CenterCrop(46), transforms.Lambda(lambda img: [img]),
@@ -73,7 +77,7 @@ def get_dataloaders(path='datasets/fer2013/fer2013.csv', bs=64, augment=True):
                 transforms.Normalize((mu,), (st,))(
                     transforms.ToTensor()(crop)
                 ) for crop in crops
-            ]))
+            ])),
             # transforms.Lambda(lambda tensors: torch.stack([transforms.RandomErasing(p=0.5)(t) for t in tensors])),
         ])
     else:
