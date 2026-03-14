@@ -64,7 +64,7 @@ def get_dataloaders(path='datasets/fer2013/fer2013.csv', bs=64, augment=True):
         train_transform = transforms.Compose([
             # transforms.RandomResizedCrop(48, scale=(0.8, 1.2)),
             # transforms.RandomApply([transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5),
-            transforms.RandomHorizontalFlip(),
+            # transforms.RandomHorizontalFlip(),
             # transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
 
             # transforms.TenCrop(40),

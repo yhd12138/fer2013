@@ -3,7 +3,7 @@ import os
 hps = {
     'network': '',  # which network do you want to train
     'name': '',  # whatever you want to name your run
-    'n_epochs': 30 ,
+    'n_epochs': 40 ,
     'model_save_dir': None,  # where will checkpoints be stored (path created automatically using hps[name])
     'restore_epoch': None,  # continue training from a specific saved point
     'start_epoch': 0,

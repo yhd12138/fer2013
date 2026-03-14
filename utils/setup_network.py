@@ -1,10 +1,10 @@
-from models import vgg, efn
+from models import vgg#, efn
 from utils.checkpoint import restore
 from utils.logger import Logger
 
 nets = {
     'vgg': vgg.Vgg,
-    'efn': efn.EfficientNet
+#    'efn': efn.EfficientNet
 }
 
 
