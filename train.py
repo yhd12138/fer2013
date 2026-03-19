@@ -32,11 +32,11 @@ def run(net, logger, hps):
     # optimizer = torch.optim.ASGD(net.parameters(), lr=learning_rate, weight_decay=0.0001)
     optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9, nesterov=True, weight_decay=0.0001)
 
-    # scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.75, patience=5) # scheduler.step(acc_v)
+    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.75, patience=5) # scheduler.step(acc_v)
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 5, gamma=0.1, last_epoch=-1)
     # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, steps_per_epoch=len(trainloader), epochs=hps['n_epochs'])
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=1e-6, last_epoch=-1, verbose=True)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hps['n_epochs'], eta_min=1e-4, last_epoch=-1)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=hps['n_epochs'], eta_min=1e-4, last_epoch=-1)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda)
     # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=get_lr_lambda2)
     # ### Start of SequentialLR
@@ -56,7 +56,8 @@ def run(net, logger, hps):
     # scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[scheduler_warmup, scheduler_cosine], milestones=[warmup_epochs])
     # ### End of SequentialLR
 
-    criterion = nn.CrossEntropyLoss()
+    # criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
 
     best_acc = 0.0
 
@@ -72,7 +73,7 @@ def run(net, logger, hps):
         logger.acc_val.append(acc_v)
 
         # Update learning rate
-        scheduler.step()
+        scheduler.step(acc_v)
 
         if acc_v > best_acc:
             best_acc = acc_v

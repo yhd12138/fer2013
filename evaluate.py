@@ -1,8 +1,10 @@
 import sys
 import warnings
 
+from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
+import seaborn as sns
 from sklearn.metrics import precision_score, f1_score, recall_score, confusion_matrix
 
 from data.fer2013 import get_dataloaders
@@ -83,6 +85,20 @@ def evaluate(net, dataloader, criterion):
     print("F1 Score: %2.6f" % f1_score(y_gt, y_pred, average='micro'))
     print("Confusion Matrix:\n", confusion_matrix(y_gt, y_pred), '\n')
 
+    # emotion mapping
+    emotion_mapping = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+    labels = [emotion_mapping[i] for i in range(len(emotion_mapping))]
+
+    # 计算混淆矩阵
+    cm = confusion_matrix(y_gt, y_pred)
+    
+    # 绘制热图
+    plt.figure(figsize=(10,8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    plt.title('Confusion Matrix for FER-2013')
+    plt.show()
 
 if __name__ == "__main__":
     # Important parameters
@@ -99,11 +115,11 @@ if __name__ == "__main__":
     # Get data with no augmentation
     trainloader, valloader, testloader = get_dataloaders(augment=False)
 
-    print("Train")
-    evaluate(net, trainloader, criterion)
+    # print("Train")
+    # evaluate(net, trainloader, criterion)
 
-    print("Val")
-    evaluate(net, valloader, criterion)
+    # print("Val")
+    # evaluate(net, valloader, criterion)
 
     print("Test")
     evaluate(net, testloader, criterion)
